@@ -27,6 +27,12 @@ const DEFAULT_PHOTOS: Photo[] = [
   { id: "default-4", url: couple4, caption: "Noite especial ❤️" },
   { id: "default-5", url: couple5, caption: "Juntos sempre 🖤" },
   { id: "default-6", url: couple6, caption: "Águas cristalinas 🌊" },
+  { id: "default-7", url: couple7, caption: "Curtindo o paraíso 🌴😎" },
+  { id: "default-8", url: couple8, caption: "Noite romântica juntos 💐" },
+  { id: "default-9", url: couple9, caption: "Comemorando vitórias 🎉" },
+  { id: "default-10", url: couple10, caption: "Nosso olhar apaixonado 💑" },
+  { id: "default-11", url: couple11, caption: "Aventura no buggy 🚙💙" },
+  { id: "default-12", url: couple12, caption: "Balanço dos sonhos 🌅" },
 ];
 
 const STORAGE_KEY = "love-gallery-photos";
