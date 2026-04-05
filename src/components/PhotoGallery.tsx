@@ -128,7 +128,7 @@ const PhotoGallery = () => {
             </button>
           </div>
 
-          <div className="relative max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-primary/30 bg-card aspect-video">
+          <div className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-primary/30 bg-card" style={{ aspectRatio: "3/4" }}>
             {allPhotos.map((photo, index) => (
               <div
                 key={photo.id}
@@ -141,7 +141,7 @@ const PhotoGallery = () => {
                 <img
                   src={photo.url}
                   alt={photo.caption || `Momento ${index + 1}`}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-card"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent" />
                 {photo.caption && (
