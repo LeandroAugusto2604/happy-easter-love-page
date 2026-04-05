@@ -1,15 +1,31 @@
 import { useState, useEffect, useCallback } from "react";
 import { Heart, X, Plus, Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 
+import couple1 from "@/assets/couple-1.jpeg";
+import couple2 from "@/assets/couple-2.jpeg";
+import couple3 from "@/assets/couple-3.jpeg";
+import couple4 from "@/assets/couple-4.jpeg";
+import couple5 from "@/assets/couple-5.jpeg";
+import couple6 from "@/assets/couple-6.jpeg";
+
 interface Photo {
   id: string;
   url: string;
   caption: string;
 }
 
+const DEFAULT_PHOTOS: Photo[] = [
+  { id: "default-1", url: couple1, caption: "Nosso momento na praia 💙" },
+  { id: "default-2", url: couple2, caption: "Passeio de barco juntos 🚤" },
+  { id: "default-3", url: couple3, caption: "Tarde perfeita na praia 🌴" },
+  { id: "default-4", url: couple4, caption: "Noite especial ❤️" },
+  { id: "default-5", url: couple5, caption: "Juntos sempre 🖤" },
+  { id: "default-6", url: couple6, caption: "Águas cristalinas 🌊" },
+];
+
 const STORAGE_KEY = "love-gallery-photos";
 
-const loadPhotos = (): Photo[] => {
+const loadExtraPhotos = (): Photo[] => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
@@ -18,7 +34,7 @@ const loadPhotos = (): Photo[] => {
   }
 };
 
-const savePhotos = (photos: Photo[]) => {
+const saveExtraPhotos = (photos: Photo[]) => {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(photos));
   } catch (e) {
@@ -27,28 +43,28 @@ const savePhotos = (photos: Photo[]) => {
 };
 
 const PhotoGallery = () => {
-  const [photos, setPhotos] = useState<Photo[]>(loadPhotos);
+  const [extraPhotos, setExtraPhotos] = useState<Photo[]>(loadExtraPhotos);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
-  const [slideshowActive, setSlideshowActive] = useState(false);
+  const [slideshowActive, setSlideshowActive] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  useEffect(() => {
-    savePhotos(photos);
-  }, [photos]);
+  const allPhotos = [...DEFAULT_PHOTOS, ...extraPhotos];
 
-  // Auto-advance slideshow
   useEffect(() => {
-    if (!slideshowActive || photos.length < 2) return;
+    saveExtraPhotos(extraPhotos);
+  }, [extraPhotos]);
+
+  useEffect(() => {
+    if (!slideshowActive || allPhotos.length < 2) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % photos.length);
+      setCurrentSlide((prev) => (prev + 1) % allPhotos.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [slideshowActive, photos.length]);
+  }, [slideshowActive, allPhotos.length]);
 
   const handleAddPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
-
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
       reader.onload = (ev) => {
@@ -57,7 +73,7 @@ const PhotoGallery = () => {
           url: ev.target?.result as string,
           caption: "",
         };
-        setPhotos((prev) => [...prev, newPhoto]);
+        setExtraPhotos((prev) => [...prev, newPhoto]);
       };
       reader.readAsDataURL(file);
     });
@@ -65,18 +81,17 @@ const PhotoGallery = () => {
   };
 
   const removePhoto = (id: string) => {
-    setPhotos((prev) => prev.filter((p) => p.id !== id));
+    if (id.startsWith("default-")) return;
+    setExtraPhotos((prev) => prev.filter((p) => p.id !== id));
     if (selectedPhoto?.id === id) setSelectedPhoto(null);
   };
 
   const goToSlide = useCallback((dir: number) => {
-    setCurrentSlide((prev) => (prev + dir + photos.length) % photos.length);
-  }, [photos.length]);
+    setCurrentSlide((prev) => (prev + dir + allPhotos.length) % allPhotos.length);
+  }, [allPhotos.length]);
 
   const toggleSlideshow = () => {
-    if (photos.length < 2) return;
     setSlideshowActive((prev) => !prev);
-    setCurrentSlide(0);
   };
 
   return (
@@ -90,79 +105,79 @@ const PhotoGallery = () => {
         </p>
 
         {/* Slideshow */}
-        {photos.length >= 2 && (
-          <div className="mb-10">
-            <div className="flex justify-center mb-4">
-              <button
-                onClick={toggleSlideshow}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-body text-sm shadow-lg hover:scale-105 transition-transform"
-              >
-                {slideshowActive ? <Pause size={16} /> : <Play size={16} />}
-                {slideshowActive ? "Pausar Slideshow" : "▶ Assistir Slideshow"}
-              </button>
-            </div>
-
-            <div className="relative max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-primary/30 bg-card aspect-video">
-              {photos.map((photo, index) => (
-                <div
-                  key={photo.id}
-                  className="absolute inset-0 transition-all duration-1000 ease-in-out"
-                  style={{
-                    opacity: index === currentSlide ? 1 : 0,
-                    transform: index === currentSlide ? "scale(1)" : "scale(1.08)",
-                  }}
-                >
-                  <img
-                    src={photo.url}
-                    alt={`Momento ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground/40 via-transparent to-transparent" />
-                </div>
-              ))}
-
-              {/* Slide counter */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-                {photos.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentSlide(i)}
-                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                      i === currentSlide
-                        ? "bg-primary-foreground scale-125 shadow-lg"
-                        : "bg-primary-foreground/50"
-                    }`}
-                  />
-                ))}
-              </div>
-
-              {/* Navigation arrows */}
-              <button
-                onClick={() => goToSlide(-1)}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-foreground/40 text-primary-foreground rounded-full p-2 hover:bg-foreground/60 transition-colors"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                onClick={() => goToSlide(1)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-foreground/40 text-primary-foreground rounded-full p-2 hover:bg-foreground/60 transition-colors"
-              >
-                <ChevronRight size={20} />
-              </button>
-
-              {/* Heart overlay */}
-              <Heart
-                className="absolute top-4 right-4 z-10 text-primary drop-shadow-lg animate-pulse"
-                size={24}
-                fill="currentColor"
-              />
-            </div>
+        <div className="mb-10">
+          <div className="flex justify-center mb-4">
+            <button
+              onClick={toggleSlideshow}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-body text-sm shadow-lg hover:scale-105 transition-transform"
+            >
+              {slideshowActive ? <Pause size={16} /> : <Play size={16} />}
+              {slideshowActive ? "Pausar Slideshow" : "▶ Assistir Slideshow"}
+            </button>
           </div>
-        )}
+
+          <div className="relative max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-primary/30 bg-card aspect-video">
+            {allPhotos.map((photo, index) => (
+              <div
+                key={photo.id}
+                className="absolute inset-0 transition-all duration-1000 ease-in-out"
+                style={{
+                  opacity: index === currentSlide ? 1 : 0,
+                  transform: index === currentSlide ? "scale(1)" : "scale(1.08)",
+                }}
+              >
+                <img
+                  src={photo.url}
+                  alt={photo.caption || `Momento ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent" />
+                {photo.caption && (
+                  <p className="absolute bottom-10 left-1/2 -translate-x-1/2 text-primary-foreground font-body text-lg drop-shadow-lg text-center px-4">
+                    {photo.caption}
+                  </p>
+                )}
+              </div>
+            ))}
+
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
+              {allPhotos.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrentSlide(i)}
+                  className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                    i === currentSlide
+                      ? "bg-primary-foreground scale-125 shadow-lg"
+                      : "bg-primary-foreground/50"
+                  }`}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={() => goToSlide(-1)}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-foreground/40 text-primary-foreground rounded-full p-2 hover:bg-foreground/60 transition-colors"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <button
+              onClick={() => goToSlide(1)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-foreground/40 text-primary-foreground rounded-full p-2 hover:bg-foreground/60 transition-colors"
+            >
+              <ChevronRight size={20} />
+            </button>
+
+            <Heart
+              className="absolute top-4 right-4 z-10 text-primary drop-shadow-lg animate-pulse"
+              size={24}
+              fill="currentColor"
+            />
+          </div>
+        </div>
 
         {/* Photo grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {photos.map((photo, index) => (
+          {allPhotos.map((photo, index) => (
             <div
               key={photo.id}
               className="relative group cursor-pointer rounded-lg overflow-hidden shadow-lg border-2 border-rose-soft hover:border-primary transition-all duration-300 hover:shadow-xl animate-fade-up"
@@ -171,7 +186,7 @@ const PhotoGallery = () => {
             >
               <img
                 src={photo.url}
-                alt={`Nosso momento ${index + 1}`}
+                alt={photo.caption || `Nosso momento ${index + 1}`}
                 className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110"
                 loading="lazy"
               />
@@ -182,15 +197,17 @@ const PhotoGallery = () => {
                   fill="currentColor"
                 />
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  removePhoto(photo.id);
-                }}
-                className="absolute top-2 right-2 bg-foreground/60 text-primary-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <X size={14} />
-              </button>
+              {!photo.id.startsWith("default-") && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    removePhoto(photo.id);
+                  }}
+                  className="absolute top-2 right-2 bg-foreground/60 text-primary-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X size={14} />
+                </button>
+              )}
             </div>
           ))}
 
@@ -208,7 +225,6 @@ const PhotoGallery = () => {
         </div>
       </div>
 
-      {/* Lightbox */}
       {selectedPhoto && (
         <div
           className="fixed inset-0 z-50 bg-foreground/80 flex items-center justify-center p-4"
