@@ -7,9 +7,7 @@ const MusicPlayer = () => {
 
   useEffect(() => {
     // Use a royalty-free romantic piano track
-    const audio = new Audio(
-      "https://cdn.pixabay.com/audio/2024/11/29/audio_a0189571d5.mp3"
-    );
+    const audio = new Audio("/music/background.mp3");
     audio.loop = true;
     audio.volume = 0.3;
     audioRef.current = audio;
