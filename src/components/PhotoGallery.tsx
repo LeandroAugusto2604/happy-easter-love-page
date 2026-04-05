@@ -7,6 +7,12 @@ import couple3 from "@/assets/couple-3.jpeg";
 import couple4 from "@/assets/couple-4.jpeg";
 import couple5 from "@/assets/couple-5.jpeg";
 import couple6 from "@/assets/couple-6.jpeg";
+import couple7 from "@/assets/couple-7.jpeg";
+import couple8 from "@/assets/couple-8.jpeg";
+import couple9 from "@/assets/couple-9.jpeg";
+import couple10 from "@/assets/couple-10.jpeg";
+import couple11 from "@/assets/couple-11.jpeg";
+import couple12 from "@/assets/couple-12.jpeg";
 
 interface Photo {
   id: string;
@@ -21,6 +27,12 @@ const DEFAULT_PHOTOS: Photo[] = [
   { id: "default-4", url: couple4, caption: "Noite especial ❤️" },
   { id: "default-5", url: couple5, caption: "Juntos sempre 🖤" },
   { id: "default-6", url: couple6, caption: "Águas cristalinas 🌊" },
+  { id: "default-7", url: couple7, caption: "Curtindo o paraíso 🌴😎" },
+  { id: "default-8", url: couple8, caption: "Noite romântica juntos 💐" },
+  { id: "default-9", url: couple9, caption: "Comemorando vitórias 🎉" },
+  { id: "default-10", url: couple10, caption: "Nosso olhar apaixonado 💑" },
+  { id: "default-11", url: couple11, caption: "Aventura no buggy 🚙💙" },
+  { id: "default-12", url: couple12, caption: "Balanço dos sonhos 🌅" },
 ];
 
 const STORAGE_KEY = "love-gallery-photos";
