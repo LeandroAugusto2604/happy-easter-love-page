@@ -7,6 +7,12 @@ import couple3 from "@/assets/couple-3.jpeg";
 import couple4 from "@/assets/couple-4.jpeg";
 import couple5 from "@/assets/couple-5.jpeg";
 import couple6 from "@/assets/couple-6.jpeg";
+import couple7 from "@/assets/couple-7.jpeg";
+import couple8 from "@/assets/couple-8.jpeg";
+import couple9 from "@/assets/couple-9.jpeg";
+import couple10 from "@/assets/couple-10.jpeg";
+import couple11 from "@/assets/couple-11.jpeg";
+import couple12 from "@/assets/couple-12.jpeg";
 
 interface Photo {
   id: string;
