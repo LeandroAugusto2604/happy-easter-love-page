@@ -1,6 +1,7 @@
 import { Heart, Egg } from "lucide-react";
 import easterHero from "@/assets/easter-hero.jpg";
 import FloatingHearts from "@/components/FloatingHearts";
+import MusicPlayer from "@/components/MusicPlayer";
 import PhotoGallery from "@/components/PhotoGallery";
 import LoveMessages from "@/components/LoveMessages";
 
@@ -8,6 +9,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <FloatingHearts />
+      <MusicPlayer />
 
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
