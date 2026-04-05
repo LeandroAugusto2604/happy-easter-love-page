@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Heart, X, Plus, Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
+import { Heart, Play, Pause, ChevronLeft, ChevronRight } from "lucide-react";
 
 import couple1 from "@/assets/couple-1.jpeg";
 import couple2 from "@/assets/couple-2.jpeg";
@@ -20,91 +20,37 @@ interface Photo {
   caption: string;
 }
 
-const DEFAULT_PHOTOS: Photo[] = [
-  { id: "default-1", url: couple1, caption: "Nosso momento na praia 💙" },
-  { id: "default-2", url: couple2, caption: "Passeio de barco juntos 🚤" },
-  { id: "default-3", url: couple3, caption: "Tarde perfeita na praia 🌴" },
-  { id: "default-4", url: couple4, caption: "Noite especial ❤️" },
-  { id: "default-5", url: couple5, caption: "Juntos sempre 🖤" },
-  { id: "default-6", url: couple6, caption: "Águas cristalinas 🌊" },
-  { id: "default-7", url: couple7, caption: "Curtindo o paraíso 🌴😎" },
-  { id: "default-8", url: couple8, caption: "Noite romântica juntos 💐" },
-  { id: "default-9", url: couple9, caption: "Comemorando vitórias 🎉" },
-  { id: "default-10", url: couple10, caption: "Nosso olhar apaixonado 💑" },
-  { id: "default-11", url: couple11, caption: "Aventura no buggy 🚙💙" },
-  { id: "default-12", url: couple12, caption: "Balanço dos sonhos 🌅" },
+const PHOTOS: Photo[] = [
+  { id: "1", url: couple1, caption: "Nosso momento na praia 💙" },
+  { id: "2", url: couple2, caption: "Passeio de barco juntos 🚤" },
+  { id: "3", url: couple3, caption: "Tarde perfeita na praia 🌴" },
+  { id: "4", url: couple4, caption: "Noite especial ❤️" },
+  { id: "5", url: couple5, caption: "Juntos sempre 🖤" },
+  { id: "6", url: couple6, caption: "Águas cristalinas 🌊" },
+  { id: "7", url: couple7, caption: "Curtindo o paraíso 🌴😎" },
+  { id: "8", url: couple8, caption: "Noite romântica juntos 💐" },
+  { id: "9", url: couple9, caption: "Comemorando vitórias 🎉" },
+  { id: "10", url: couple10, caption: "Nosso olhar apaixonado 💑" },
+  { id: "11", url: couple11, caption: "Aventura no buggy 🚙💙" },
+  { id: "12", url: couple12, caption: "Balanço dos sonhos 🌅" },
 ];
 
-const STORAGE_KEY = "love-gallery-photos";
-
-const loadExtraPhotos = (): Photo[] => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch {
-    return [];
-  }
-};
-
-const saveExtraPhotos = (photos: Photo[]) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(photos));
-  } catch (e) {
-    console.warn("Não foi possível salvar fotos no localStorage:", e);
-  }
-};
-
 const PhotoGallery = () => {
-  const [extraPhotos, setExtraPhotos] = useState<Photo[]>(loadExtraPhotos);
   const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
   const [slideshowActive, setSlideshowActive] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  const allPhotos = [...DEFAULT_PHOTOS, ...extraPhotos];
-
   useEffect(() => {
-    saveExtraPhotos(extraPhotos);
-  }, [extraPhotos]);
-
-  useEffect(() => {
-    if (!slideshowActive || allPhotos.length < 2) return;
+    if (!slideshowActive) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % allPhotos.length);
+      setCurrentSlide((prev) => (prev + 1) % PHOTOS.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, [slideshowActive, allPhotos.length]);
-
-  const handleAddPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-    Array.from(files).forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const newPhoto: Photo = {
-          id: Date.now().toString() + Math.random().toString(36),
-          url: ev.target?.result as string,
-          caption: "",
-        };
-        setExtraPhotos((prev) => [...prev, newPhoto]);
-      };
-      reader.readAsDataURL(file);
-    });
-    e.target.value = "";
-  };
-
-  const removePhoto = (id: string) => {
-    if (id.startsWith("default-")) return;
-    setExtraPhotos((prev) => prev.filter((p) => p.id !== id));
-    if (selectedPhoto?.id === id) setSelectedPhoto(null);
-  };
+  }, [slideshowActive]);
 
   const goToSlide = useCallback((dir: number) => {
-    setCurrentSlide((prev) => (prev + dir + allPhotos.length) % allPhotos.length);
-  }, [allPhotos.length]);
-
-  const toggleSlideshow = () => {
-    setSlideshowActive((prev) => !prev);
-  };
+    setCurrentSlide((prev) => (prev + dir + PHOTOS.length) % PHOTOS.length);
+  }, []);
 
   return (
     <section className="py-16 px-4">
@@ -120,7 +66,7 @@ const PhotoGallery = () => {
         <div className="mb-10">
           <div className="flex justify-center mb-4">
             <button
-              onClick={toggleSlideshow}
+              onClick={() => setSlideshowActive((prev) => !prev)}
               className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground font-body text-sm shadow-lg hover:scale-105 transition-transform"
             >
               {slideshowActive ? <Pause size={16} /> : <Play size={16} />}
@@ -129,7 +75,7 @@ const PhotoGallery = () => {
           </div>
 
           <div className="relative max-w-2xl mx-auto rounded-2xl overflow-hidden shadow-2xl border-2 border-primary/30 bg-card" style={{ aspectRatio: "3/4" }}>
-            {allPhotos.map((photo, index) => (
+            {PHOTOS.map((photo, index) => (
               <div
                 key={photo.id}
                 className="absolute inset-0 transition-all duration-1000 ease-in-out"
@@ -140,7 +86,7 @@ const PhotoGallery = () => {
               >
                 <img
                   src={photo.url}
-                  alt={photo.caption || `Momento ${index + 1}`}
+                  alt={photo.caption}
                   className="w-full h-full object-contain bg-card"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-foreground/50 via-transparent to-transparent" />
@@ -153,7 +99,7 @@ const PhotoGallery = () => {
             ))}
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
-              {allPhotos.map((_, i) => (
+              {PHOTOS.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrentSlide(i)}
@@ -189,7 +135,7 @@ const PhotoGallery = () => {
 
         {/* Photo grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {allPhotos.map((photo, index) => (
+          {PHOTOS.map((photo, index) => (
             <div
               key={photo.id}
               className="relative group cursor-pointer rounded-lg overflow-hidden shadow-lg border-2 border-rose-soft hover:border-primary transition-all duration-300 hover:shadow-xl animate-fade-up"
@@ -198,7 +144,7 @@ const PhotoGallery = () => {
             >
               <img
                 src={photo.url}
-                alt={photo.caption || `Nosso momento ${index + 1}`}
+                alt={photo.caption}
                 className="w-full aspect-square object-cover transition-transform duration-500 group-hover:scale-110"
                 loading="lazy"
               />
@@ -209,34 +155,12 @@ const PhotoGallery = () => {
                   fill="currentColor"
                 />
               </div>
-              {!photo.id.startsWith("default-") && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removePhoto(photo.id);
-                  }}
-                  className="absolute top-2 right-2 bg-foreground/60 text-primary-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X size={14} />
-                </button>
-              )}
             </div>
           ))}
-
-          <label className="flex flex-col items-center justify-center aspect-square rounded-lg border-2 border-dashed border-primary/40 bg-rose-soft/50 cursor-pointer hover:border-primary hover:bg-rose-soft transition-all duration-300">
-            <Plus className="text-primary mb-2" size={32} />
-            <span className="text-sm text-muted-foreground font-body">Adicionar fotos</span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={handleAddPhoto}
-            />
-          </label>
         </div>
       </div>
 
+      {/* Lightbox */}
       {selectedPhoto && (
         <div
           className="fixed inset-0 z-50 bg-foreground/80 flex items-center justify-center p-4"
@@ -245,14 +169,14 @@ const PhotoGallery = () => {
           <div className="relative max-w-3xl max-h-[90vh] animate-fade-up">
             <img
               src={selectedPhoto.url}
-              alt="Nosso momento"
+              alt={selectedPhoto.caption}
               className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
             />
             <button
               onClick={() => setSelectedPhoto(null)}
               className="absolute -top-3 -right-3 bg-primary text-primary-foreground rounded-full p-2 shadow-lg hover:scale-110 transition-transform"
             >
-              <X size={20} />
+              <Heart size={20} />
             </button>
           </div>
         </div>
